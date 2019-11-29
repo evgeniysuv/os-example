@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: employee-service
+
+server:
+  port: 8080
+  servlet:
+    context-path: /employee-service
+
+microservices:
+  departments:
+    url: http://departments:8081
