@@ -17,7 +17,7 @@ public class EmployeeController {
     @Value("${microservices.departments.url}")
     private String departmentsUrl;
 
-    @GetMapping("employee")
+    @GetMapping(value = "employee", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getDepartments() {
         System.out.println("Connection to http://departments:8081/department-service/departments");
         String block = WebClient.builder()

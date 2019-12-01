@@ -1,35 +1,44 @@
 package com.suv.employeeservice.configuration;
 
 import lombok.Builder;
-import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
-import org.springframework.http.HttpHeaders;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.net.UnknownHostException;
+import java.net.ConnectException;
 import java.time.LocalDateTime;
 
 /**
  * Created by esuv on 2019-11-29
  */
+@Slf4j
 @ControllerAdvice
 public class ExceptionHandlerConfig extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(UnknownHostException.class)
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "This should be application specific";
-        DefaultErrorAttributes defaultErrorAttributes = new DefaultErrorAttributes();
-        return handleExceptionInternal(ex, ex.getLocalizedMessage(),
-                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity handleConnectionException(RuntimeException ex) {
+        logger.error("connection exception", ex);
+        val response = EmployeeError.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .error(ex.getMessage())
+                .message("error")
+                .build();
+        return new ResponseEntity<>(response, response.status);
     }
 
     @Builder
-    class EmployeeError {
+    @Data
+    private static class EmployeeError {
 
-        private LocalDateTime time;
+        private LocalDateTime timestamp;
+        private HttpStatus status;
+        private String error;
+        private String message;
     }
 }
